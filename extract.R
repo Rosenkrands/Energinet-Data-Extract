@@ -39,3 +39,23 @@ data.extract <- function(resource_id) {
   data.extract.data.frame <- as.data.frame(this.content$result$records)
   return(data.extract.data.frame)
 }
+
+data.extract.all <- function() {
+  data.list <- list()
+  total <- length(data.set.list)
+  iter <- 0
+  cat("Extracting the first dataset...", "\n")
+  start <- Sys.time()
+  for (i in 1:length(data.set.list)) {
+    begin <- Sys.time()
+    iter <- iter + 1
+    data.list[i] <- data.extract(as.character(data.set.list[i]))
+    end <- Sys.time()
+    cat(iter, "of", total, "done | Iteration time:", difftime(end, begin, units = "secs"),
+        "seconds | Total time spent:", difftime(end, start, units = "secs") ,"seconds", "\n")
+  }
+  finished <- Sys.time()
+  cat("Total time spent:", difftime(finished, start, units = "secs"), "seconds", "\n")
+  return(data.list)
+}
+complete.list <- data.extract.all()
