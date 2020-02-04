@@ -41,21 +41,23 @@ data.extract <- function(resource_id) {
 }
 
 data.extract.all <- function() {
-  data.list <- list()
+  dir.create(paste("Extracted_data_from_", Sys.Date(), sep = ''))
+  setwd(paste("C:/Users/Kasper/Desktop","/Extracted_data_from_", Sys.Date(), sep = ''))
   total <- length(data.set.list)
   iter <- 0
-  cat("Extracting the first dataset...", "\n")
   start <- Sys.time()
   for (i in 1:length(data.set.list)) {
     begin <- Sys.time()
     iter <- iter + 1
-    data.list[i] <- data.extract(as.character(data.set.list[i]))
+    #cat("Extracting:", as.character(data.set.list[i]), "\n")
+    data.set <- data.extract(as.character(data.set.list[i]))
+    save(data.set, file = paste(as.character(data.set.list[i]),".Rdata",sep=''))
+    #cat("Done!","\n")
     end <- Sys.time()
     cat(iter, "of", total, "done | Iteration time:", difftime(end, begin, units = "secs"),
-        "seconds | Total time spent:", difftime(end, start, units = "secs") ,"seconds", "\n")
+        "seconds | Total time spent:", difftime(end, start, units = "mins") ,"minutes", "\n")
   }
   finished <- Sys.time()
-  cat("Total time spent:", difftime(finished, start, units = "secs"), "seconds", "\n")
-  return(data.list)
+  cat("Total time spent:", difftime(finished, start, units = "mins"), "minutes", "\n")
 }
-complete.list <- data.extract.all()
+data.extract.all()
