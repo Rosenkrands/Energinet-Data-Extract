@@ -40,9 +40,31 @@ data.extract <- function(resource_id) {
   return(data.extract.data.frame)
 }
 
+data.extract.2 <- function(resource_id) {
+  # Determine total row count
+  url  <- "https://api.energidataservice.dk"
+  path <- paste("datastore_search?resource_id=",
+                resource_id,
+                "&limit=5",
+                sep = ''
+  )
+  this.content <- fromJSON(rawToChar(GET(url = url, path = path)$content))
+  row.limit <- this.content$result$total
+  # Extract the all observations to a data.frame
+  path <- paste("datastore_search?resource_id=",
+                resource_id,
+                "&limit=",
+                as.character(row.limit),
+                sep = ''
+  )
+  data.extract.data.frame <- as.data.frame(fromJSON(rawToChar(GET(url = url, path = path)$content))$result$records)
+  return(data.extract.data.frame)
+}
+
 data.extract.all <- function() {
+  setwd("Z:/")
   dir.create(paste("Extracted_data_from_", Sys.Date(), sep = ''))
-  setwd(paste("C:/Users/Kasper/Desktop","/Extracted_data_from_", Sys.Date(), sep = ''))
+  setwd(paste("Z:","/Extracted_data_from_", Sys.Date(), sep = ''))
   total <- length(data.set.list)
   iter <- 0
   start <- Sys.time()
@@ -50,7 +72,7 @@ data.extract.all <- function() {
     begin <- Sys.time()
     iter <- iter + 1
     #cat("Extracting:", as.character(data.set.list[i]), "\n")
-    data.set <- data.extract(as.character(data.set.list[i]))
+    data.set <- data.extract.2(as.character(data.set.list[i]))
     save(data.set, file = paste(as.character(data.set.list[i]),".Rdata",sep=''))
     #cat("Done!","\n")
     end <- Sys.time()
