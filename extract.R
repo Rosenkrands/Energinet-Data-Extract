@@ -1,6 +1,7 @@
 library(httr)
 library(jsonlite)
 library(lubridate)
+library(stringr)
 
 options(stringsAsFactors = F)
 
@@ -28,11 +29,11 @@ data.extract <- function(resource_id) {
   row.limit <- this.content$result$total
   # Extract the all observations to a data.frame
   path <- paste("datastore_search?resource_id=",
-                  resource_id,
-                  "&limit=",
-                  as.character(row.limit),
-                  sep = ''
-                )
+                resource_id,
+                "&limit=",
+                as.character(row.limit),
+                sep = ''
+  )
   raw.result <- GET(url = url, path = path)
   this.raw.content <- rawToChar(raw.result$content)
   this.content <- fromJSON(this.raw.content)
@@ -72,14 +73,16 @@ data.extract.all <- function() {
     begin <- Sys.time()
     iter <- iter + 1
     #cat("Extracting:", as.character(data.set.list[i]), "\n")
+    
     data.set <- data.extract.2(as.character(data.set.list[i]))
     save(data.set, file = paste(as.character(data.set.list[i]),".Rdata",sep=''))
+    
     #cat("Done!","\n")
     end <- Sys.time()
-    cat(iter, "of", total, "done | Iteration time:", difftime(end, begin, units = "secs"),
-        "seconds | Total time spent:", difftime(end, start, units = "mins") ,"minutes", "\n")
+    cat(str_pad(as.character(iter),2,pad="0"), "of", total, "done\tIteration time:", round(difftime(end, begin, units = "secs"), digits = 2),
+        "seconds\tTotal time spent:", round(difftime(end, start, units = "mins"), digits = 1) ,"minutes", "\n")
   }
   finished <- Sys.time()
-  cat("Total time spent:", difftime(finished, start, units = "mins"), "minutes", "\n")
+  cat("Total time spent:", round(difftime(finished, start, units = "mins"), digits = 1), "minutes", "\n")
 }
 data.extract.all()
